@@ -1,17 +1,18 @@
-name: Java CI Pipeline
+name: Java CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -19,10 +20,22 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
 
       - name: Compile
         run: javac Calculator.java
 
-      - name: Run
+      - name: Run Calculator
         run: java Calculator
+
+      - name: Prepare Deployment
+        run: |
+          mkdir deploy
+          cp Calculator.java deploy/
+          echo "<h1>Java Calculator CI/CD Deployment Successful</h1>" > deploy/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
