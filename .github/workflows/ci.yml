@@ -1,4 +1,4 @@
-name: Java CI/CD Pipeline
+name: Java CI/CD + SonarQube Security Scan
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-and-scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,17 +25,18 @@ jobs:
       - name: Compile
         run: javac Calculator.java
 
-      - name: Run Calculator
-        run: java Calculator
-
-      - name: Prepare Deployment
+      - name: Run Application
         run: |
-          mkdir deploy
-          cp Calculator.java deploy/
-          echo "<h1>Java Calculator CI/CD Deployment Successful</h1>" > deploy/index.html
+          echo -e "admin\nAdmin@123\n5" | java Calculator
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
+      - name: Check Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
