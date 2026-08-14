@@ -17,9 +17,13 @@ public class Calculator {
 
         System.out.print("Enter password: ");
         String password = sc.nextLine();
-	// INTENTIONALLY INSECURE: hardcoded credentials for Experiment 3
-String ADMIN_USERNAME = "admin";
-String ADMIN_PASSWORD = "Admin@123";
+	String dbUrl = "jdbc:mysql://localhost:3306/bank";
+String dbUsername = "admin";
+String dbPassword = "Admin@123";
+
+System.out.println("Connecting to database...");
+System.out.println("Username: " + dbUsername);
+System.out.println("Password configured: " + !dbPassword.isEmpty());
 
         // Temporary login for the application
         if (!username.equals("admin") || !password.equals("Admin@123")) {
