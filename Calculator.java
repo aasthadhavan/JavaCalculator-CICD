@@ -1,12 +1,11 @@
 import java.util.Scanner;
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Calculator {
 
     private static double balance = 10000.0;
-
-    // INTENTIONALLY HARDCODED FOR EXPERIMENT 3 SECURITY SCANNING
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_PASSWORD = "Admin@123";
 
     public static void main(String[] args) {
 
@@ -16,107 +15,187 @@ public class Calculator {
         System.out.println("          SECURE BANK");
         System.out.println("================================");
 
+        login(sc);
+        runBankingMenu(sc);
+
+        sc.close();
+    }
+
+    private static void login(Scanner sc) {
+
         System.out.print("Enter username: ");
         String username = sc.nextLine();
 
         System.out.print("Enter password: ");
         String password = sc.nextLine();
 
-        // INTENTIONALLY INSECURE LOGIN
-        if (!ADMIN_USERNAME.equals(username)
-                || !ADMIN_PASSWORD.equals(password)) {
+        /*
+         * INTENTIONALLY HARDCODED CREDENTIAL
+         * Experiment 3: Security Scanning in CI
+         */
+        String dbUrl = "jdbc:mysql://localhost:3306/bank";
+        String dbUser = "admin";
 
-            System.out.println("Invalid username or password.");
-            sc.close();
-            return;
+        try {
+            Connection connection = DriverManager.getConnection(
+                dbUrl,
+                dbUser,
+                "Admin@123"
+            );
+
+            System.out.println("Database connection successful.");
+            connection.close();
+
+        } catch (SQLException e) {
+            System.out.println(
+                "Database connection failed: " + e.getMessage()
+            );
         }
 
-        System.out.println("\nLogin successful!");
+        if ("admin".equals(username)
+                && "Admin@123".equals(password)) {
+
+            System.out.println("Login successful!");
+
+        } else {
+
+            System.out.println("Invalid username or password.");
+        }
+    }
+
+    private static void runBankingMenu(Scanner sc) {
 
         int choice;
 
         do {
-            System.out.println("\n========== MENU ==========");
-            System.out.println("1. Check Balance");
-            System.out.println("2. Deposit");
-            System.out.println("3. Withdraw");
-            System.out.println("4. Transfer");
-            System.out.println("5. Exit");
-            System.out.println("==========================");
+
+            displayMenu();
 
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
 
-            switch (choice) {
-
-                case 1:
-                    System.out.println("Current Balance: ₹" + balance);
-                    break;
-
-                case 2:
-                    System.out.print("Enter deposit amount: ₹");
-                    double deposit = sc.nextDouble();
-
-                    if (deposit > 0) {
-                        balance += deposit;
-                        System.out.println("Deposit successful.");
-                        System.out.println("New Balance: ₹" + balance);
-                    } else {
-                        System.out.println("Invalid amount.");
-                    }
-                    break;
-
-                case 3:
-                    System.out.print("Enter withdrawal amount: ₹");
-                    double withdraw = sc.nextDouble();
-
-                    if (withdraw > 0 && withdraw <= balance) {
-                        balance -= withdraw;
-                        System.out.println("Withdrawal successful.");
-                        System.out.println("New Balance: ₹" + balance);
-                    } else {
-                        System.out.println(
-                            "Invalid amount or insufficient balance."
-                        );
-                    }
-                    break;
-
-                case 4:
-                    System.out.print("Enter recipient username: ");
-                    String recipient = sc.next();
-
-                    System.out.print("Enter transfer amount: ₹");
-                    double transfer = sc.nextDouble();
-
-                    if (transfer > 0 && transfer <= balance) {
-                        balance -= transfer;
-
-                        System.out.println("Transfer successful.");
-                        System.out.println(
-                            "Transferred ₹" + transfer + " to " + recipient
-                        );
-                        System.out.println(
-                            "Remaining Balance: ₹" + balance
-                        );
-                    } else {
-                        System.out.println(
-                            "Invalid amount or insufficient balance."
-                        );
-                    }
-                    break;
-
-                case 5:
-                    System.out.println(
-                        "Thank you for using Secure Bank."
-                    );
-                    break;
-
-                default:
-                    System.out.println("Invalid choice.");
-            }
+            processChoice(choice, sc);
 
         } while (choice != 5);
+    }
 
-        sc.close();
+    private static void displayMenu() {
+
+        System.out.println("\n========== MENU ==========");
+        System.out.println("1. Check Balance");
+        System.out.println("2. Deposit");
+        System.out.println("3. Withdraw");
+        System.out.println("4. Transfer");
+        System.out.println("5. Exit");
+        System.out.println("==========================");
+    }
+
+    private static void processChoice(int choice, Scanner sc) {
+
+        switch (choice) {
+
+            case 1:
+                checkBalance();
+                break;
+
+            case 2:
+                deposit(sc);
+                break;
+
+            case 3:
+                withdraw(sc);
+                break;
+
+            case 4:
+                transfer(sc);
+                break;
+
+            case 5:
+                System.out.println(
+                    "Thank you for using Secure Bank."
+                );
+                break;
+
+            default:
+                System.out.println("Invalid choice.");
+        }
+    }
+
+    private static void checkBalance() {
+
+        System.out.println(
+            "Current Balance: ₹" + balance
+        );
+    }
+
+    private static void deposit(Scanner sc) {
+
+        System.out.print("Enter deposit amount: ₹");
+        double amount = sc.nextDouble();
+
+        if (amount > 0) {
+
+            balance += amount;
+
+            System.out.println("Deposit successful.");
+            System.out.println(
+                "New Balance: ₹" + balance
+            );
+
+        } else {
+
+            System.out.println("Invalid amount.");
+        }
+    }
+
+    private static void withdraw(Scanner sc) {
+
+        System.out.print("Enter withdrawal amount: ₹");
+        double amount = sc.nextDouble();
+
+        if (amount > 0 && amount <= balance) {
+
+            balance -= amount;
+
+            System.out.println("Withdrawal successful.");
+            System.out.println(
+                "New Balance: ₹" + balance
+            );
+
+        } else {
+
+            System.out.println(
+                "Invalid amount or insufficient balance."
+            );
+        }
+    }
+
+    private static void transfer(Scanner sc) {
+
+        System.out.print("Enter recipient username: ");
+        String recipient = sc.next();
+
+        System.out.print("Enter transfer amount: ₹");
+        double amount = sc.nextDouble();
+
+        if (amount > 0 && amount <= balance) {
+
+            balance -= amount;
+
+            System.out.println("Transfer successful.");
+            System.out.println(
+                "Transferred ₹" + amount + " to " + recipient
+            );
+
+            System.out.println(
+                "Remaining Balance: ₹" + balance
+            );
+
+        } else {
+
+            System.out.println(
+                "Invalid amount or insufficient balance."
+            );
+        }
     }
 }
