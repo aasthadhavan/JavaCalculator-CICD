@@ -17,6 +17,9 @@ public class Calculator {
 
         System.out.print("Enter password: ");
         String password = sc.nextLine();
+	// INTENTIONALLY INSECURE: hardcoded credentials for Experiment 3
+String ADMIN_USERNAME = "admin";
+String ADMIN_PASSWORD = "Admin@123";
 
         // Temporary login for the application
         if (!username.equals("admin") || !password.equals("Admin@123")) {
