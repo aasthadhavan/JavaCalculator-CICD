@@ -4,12 +4,16 @@ public class Calculator {
 
     private static double balance = 10000.0;
 
+    // INTENTIONALLY HARDCODED FOR EXPERIMENT 3 SECURITY SCANNING
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_PASSWORD = "Admin@123";
+
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
 
         System.out.println("================================");
-        System.out.println("        SECURE BANK");
+        System.out.println("          SECURE BANK");
         System.out.println("================================");
 
         System.out.print("Enter username: ");
@@ -17,16 +21,11 @@ public class Calculator {
 
         System.out.print("Enter password: ");
         String password = sc.nextLine();
-	String dbUrl = "jdbc:mysql://localhost:3306/bank";
-String dbUsername = "admin";
-String dbPassword = "Admin@123";
 
-System.out.println("Connecting to database...");
-System.out.println("Username: " + dbUsername);
-System.out.println("Password configured: " + !dbPassword.isEmpty());
+        // INTENTIONALLY INSECURE LOGIN
+        if (!ADMIN_USERNAME.equals(username)
+                || !ADMIN_PASSWORD.equals(password)) {
 
-        // Temporary login for the application
-        if (!username.equals("admin") || !password.equals("Admin@123")) {
             System.out.println("Invalid username or password.");
             sc.close();
             return;
@@ -76,7 +75,9 @@ System.out.println("Password configured: " + !dbPassword.isEmpty());
                         System.out.println("Withdrawal successful.");
                         System.out.println("New Balance: ₹" + balance);
                     } else {
-                        System.out.println("Invalid amount or insufficient balance.");
+                        System.out.println(
+                            "Invalid amount or insufficient balance."
+                        );
                     }
                     break;
 
@@ -91,16 +92,23 @@ System.out.println("Password configured: " + !dbPassword.isEmpty());
                         balance -= transfer;
 
                         System.out.println("Transfer successful.");
-                        System.out.println("Transferred ₹" + transfer +
-                                " to " + recipient);
-                        System.out.println("Remaining Balance: ₹" + balance);
+                        System.out.println(
+                            "Transferred ₹" + transfer + " to " + recipient
+                        );
+                        System.out.println(
+                            "Remaining Balance: ₹" + balance
+                        );
                     } else {
-                        System.out.println("Invalid amount or insufficient balance.");
+                        System.out.println(
+                            "Invalid amount or insufficient balance."
+                        );
                     }
                     break;
 
                 case 5:
-                    System.out.println("Thank you for using Secure Bank.");
+                    System.out.println(
+                        "Thank you for using Secure Bank."
+                    );
                     break;
 
                 default:
