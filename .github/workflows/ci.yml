@@ -1,4 +1,4 @@
-name: Java CI/CD + SonarQube Security Scan
+name: Java Security CI Pipeline
 
 on:
   push:
@@ -6,12 +6,14 @@ on:
       - main
 
 jobs:
-  build-and-scan:
+  security-scan:
+
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af6832
 
       - name: Setup Java
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
@@ -19,20 +21,19 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Compile
+      - name: Compile Java Application
         run: javac Calculator.java
 
-      - name: Run Application
+      - name: Run Java Application
         run: |
           echo -e "admin\nAdmin@123\n5" | java Calculator
 
-      - name: SonarQube Scan
+      - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@c7ee0f9df90b7aa20e8dcf9695dcfe2e7da5b4f2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
 
-      - name: Check Quality Gate
+      - name: Check SonarQube Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@7a5fffe8e523c40e0c740b6bc2712ab503e52efa
         timeout-minutes: 5
         env:
